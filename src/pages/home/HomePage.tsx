@@ -1,21 +1,37 @@
-import { useNavigate } from "react-router"
+import type { ITvShow } from "../../types";
+import { useEffect, useState } from "react";
+import { SearchInput } from "../../components/SearchInput/SearchInput";
+import { BASE_URL } from "../../constants";
 
-export const HomePage = () =>{
-    const navigate = useNavigate()
+export const HomePage = () => {
+    const [shows, setShows] = useState<ITvShow[]>([])
+    const [searchValue, setSearchValue] = useState('')
 
-    const onContactsClick = () => {
-        navigate('/contacts')
-    }
+    useEffect(() => {
+        const getTvSows = async() => {
+            try {
+                const response = await fetch(`${BASE_URL}/search/shows?q=${searchValue}`)
+                if(!response.ok) {
+                    throw new Error("Failed to get TV Shows!")
+                }
+                const showData: ITvShow[] = await response.json();
+                setShows(showData);
+            } catch (error) {
+                console.log(error)
+            }
+        } 
+        getTvSows()
+    }, [searchValue]) 
 
-    const onAboutClick = (id: number) =>  {
-        navigate(`/about/${id}`)
-    }
+    console.log(shows)
+
     return (
         <div>
-            home
-            <button onClick={onContactsClick}>go to contacts</button>
-            <button onClick={() => onAboutClick(1)}> go to about page id 1</button>
-            <button onClick={() => onAboutClick(2)}> go to about page id 2</button>
+            <SearchInput 
+                searchValue={searchValue} 
+                setSearchValue={setSearchValue}
+            />
+             
         </div>
     )
 }
